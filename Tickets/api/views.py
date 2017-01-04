@@ -13,7 +13,7 @@ from serializers import AccountSerializer
 
 from rest_framework.permissions import AllowAny 
 from rest_framework.permissions import IsAuthenticated
-
+from rest_framework.compat import is_authenticated
 # Create your views here.
 
 class UserViewSet(viewsets.ModelViewSet):

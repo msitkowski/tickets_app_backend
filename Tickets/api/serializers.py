@@ -42,18 +42,28 @@ class TicketSerializer(serializers.ModelSerializer):
         fields = ('url', 'name',
                   'price', 'description',
                   'time_of_validity', 'time_unit')
+        read_only_fields = ('url', 'name',
+                  'price', 'description',
+                  'time_of_validity', 'time_unit')
         
 class UserTicketsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserTickets
-#         read_only_fields = ('url', 'user_id',
-#                             'ticket_id')
         fields = ('url', 'user_id',
                   'ticket_id', 'status',
                   'valid_to_date')
+        read_only_fields = ('url', 'user_id',
+                            'valid_to_date')
     
     def create(self, validated_data):
-        account = Account.objects.get(user_id=validated_data.get('user_id'))
+        # set default status to new 
+        # even if user try to create ticket with other status
+        validated_data['status'] = 'new'
+        # set current user as ticket buyer
+        validated_data['user_id'] = self.context.get('request').user
+        # getting current user account from which money will be subtracted
+        account = Account.objects.get(user_id=validated_data.get('user_id').id)
+        # get ticket
         ticket = Ticket.objects.get(pk=validated_data.get('ticket_id').id)
         # subtract money from user account if enough money
         if account.account_balance >= ticket.price:
@@ -61,23 +71,32 @@ class UserTicketsSerializer(serializers.ModelSerializer):
             account.save()
             
         else:
-            raise ValueError("Not enough money! Please charge your account.")
+            raise serializers.ValidationError(detail='Not enough money! Please charge your account.')
         
         return serializers.ModelSerializer.create(self, validated_data)
     
     def update(self, instance, validated_data):
-        # when ticket change state from zakupiony to skasowany, set valid to date
-        if instance.status == 'new' and validated_data.get('status') == 'active':
-            # set ticket valid to date depending on ticket time unit and validity
-            if instance.ticket_id.time_unit == 'm':
-                instance.valid_to_date = datetime.now()+relativedelta(seconds=+instance.ticket_id.time_of_validity*60)
+        # update only new and active tickets
+        if instance.status != 'inactive' \
+        and validated_data.get('status') != 'new' \
+        and instance.status != validated_data.get('status'):
+            # when ticket change state from zakupiony to skasowany, set valid to date
+            if instance.status == 'new' and validated_data.get('status') == 'active':
+                # set ticket valid to date depending on ticket time unit and validity
+                if instance.ticket_id.time_unit == 'm':
+                    instance.valid_to_date = datetime.now()+relativedelta(seconds=+instance.ticket_id.time_of_validity*60)
+                
+                else:
+                    instance.valid_to_date = datetime.now()+relativedelta(hours=+instance.ticket_id.time_of_validity)
+            
+            # update only status and valid to date
+            if instance.valid_to_date < datetime.now():
+                instance.status = validated_data.get('status')
             
             else:
-                instance.valid_to_date = datetime.now()+relativedelta(hours=+instance.ticket_id.time_of_validity)
-        
-        # update only status and valid to date
-        instance.status = validated_data.get('status')
-        instance.save()
+                instance.status = 'inactive'
+                
+            instance.save()
         
         return instance
     
@@ -86,13 +105,13 @@ class AccountSerializer(serializers.ModelSerializer):
         model = Account
         fields = ('url', 'user_id',
                   'account_balance',)
-#         read_only_fields = ('url', 'user_id',)
+        read_only_fields = ('url', 'user_id',)
         
     def update(self, instance, validated_data):
         if validated_data.get('account_balance', None) and validated_data.get('account_balance') > 0:
             validated_data['account_balance'] += instance.account_balance
         
         else:
-            raise ValueError('Account balance must be positive non 0 value!')
+            raise serializers.ValidationError(detail='Account balance must be positive non 0 value!')
             
         return serializers.ModelSerializer.update(self, instance, validated_data)

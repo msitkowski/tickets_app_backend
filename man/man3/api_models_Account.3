@@ -1,0 +1,51 @@
+.TH "api.models.Account" 3 "Fri Jan 13 2017" "Version v1.0" "Tickets backend" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+api.models.Account
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits Model\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fB__unicode__\fP (self)"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBaccount_balance\fP"
+.br
+.ti -1c
+.RI "\fBuser_id\fP = models\&.OneToOneField(User, on_delete=models\&.CASCADE)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+.nf
+   Model store user account balance 
+
+.fi
+.PP
+ 
+.SH "Member Data Documentation"
+.PP 
+.SS "api\&.models\&.Account\&.account_balance\fC [static]\fP"
+\fBInitial value:\fP
+.PP
+.nf
+=  models\&.DecimalField(max_digits=6, decimal_places=2,
+                                          default=0\&.00, validators=[MinValueValidator(Decimal('0\&.00'))])
+.fi
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Tickets backend from the source code\&.

@@ -1,0 +1,67 @@
+.TH "api.models.UserTickets" 3 "Fri Jan 13 2017" "Version v1.0" "Tickets backend" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+api.models.UserTickets
+.SH SYNOPSIS
+.br
+.PP
+.PP
+Inherits Model\&.
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "def \fB__unicode__\fP (self)"
+.br
+.in -1c
+.SS "Static Public Attributes"
+
+.in +1c
+.ti -1c
+.RI "\fBuser_id\fP = models\&.ForeignKey(User, on_delete=models\&.CASCADE)"
+.br
+.ti -1c
+.RI "\fBticket_id\fP"
+.br
+.ti -1c
+.RI "\fBstatus\fP"
+.br
+.ti -1c
+.RI "\fBvalid_to_date\fP = models\&.DateTimeField(blank=True, null=True)"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+
+.PP
+.nf
+    Model store tickets bought by user
+
+.fi
+.PP
+ 
+.SH "Member Data Documentation"
+.PP 
+.SS "api\&.models\&.UserTickets\&.status\fC [static]\fP"
+\fBInitial value:\fP
+.PP
+.nf
+=  models\&.CharField(max_length=10,
+                              choices=(('new', 'Zakupiony'),
+                                       ('active', 'Skasowany'),
+                                       ('inactive', 'Nieważny')),
+                              default='new')
+.fi
+.SS "api\&.models\&.UserTickets\&.ticket_id\fC [static]\fP"
+\fBInitial value:\fP
+.PP
+.nf
+=  models\&.ForeignKey(Ticket, null=True,
+                                  on_delete=models\&.SET_NULL)
+.fi
+
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Tickets backend from the source code\&.

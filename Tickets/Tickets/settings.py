@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 
 import os
 
+import psycopg2.extensions
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -26,7 +28,7 @@ SECRET_KEY = 'i59q9o_(@n)w98u5ax1!*@7)n-*zyl&89nlg^+7$admt34o9ml'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['ec2-54-93-114-125.eu-central-1.compute.amazonaws.com']
 
 
 # Application definition
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'api',
+    'django_extensions',
 ]
 
 REST_FRAMEWORK = {
@@ -52,7 +55,7 @@ REST_FRAMEWORK = {
     )
 }
 
-MIDDLEWARE = [
+MIDDLEWARE_CLASSES = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -88,9 +91,18 @@ WSGI_APPLICATION = 'Tickets.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'tickets',
+        'USER': 'dbadmin',
+        'PASSWORD': 'wizut',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
+    'OPTIONS': {
+        'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+        'client_encoding': 'UTF8',
+        'timezone': 'UTC',
+    },
 }
 
 
